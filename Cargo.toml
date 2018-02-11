@@ -1,0 +1,7 @@
+[workspace]
+members = [
+    "connect-four",
+    "game",
+    "tic-tac-toe",
+    "player-of-games",
+]

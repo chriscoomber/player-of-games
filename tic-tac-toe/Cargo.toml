@@ -1,0 +1,10 @@
+[package]
+name = "tic-tac-toe"
+version = "0.1.0"
+authors = ["chriscoomber <Christopher.Coomber@metaswitch.com>"]
+
+[dependencies]
+game = {path = "../game"}
+ndarray = "0.11.1"
+
+[dev-dependencies]

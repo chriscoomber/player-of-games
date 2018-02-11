@@ -1,0 +1,8 @@
+[package]
+name = "player-of-games"
+version = "0.1.0"
+authors = ["chriscoomber <Christopher.Coomber@metaswitch.com>"]
+
+[dependencies]
+
+[dev-dependencies]

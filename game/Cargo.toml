@@ -1,0 +1,10 @@
+[package]
+name = "game"
+version = "0.1.0"
+authors = ["chriscoomber <Christopher.Coomber@metaswitch.com>"]
+
+[dependencies]
+rand = "0.4.2"
+
+[dev-dependencies]
+tic-tac-toe = {path = "../tic-tac-toe"}
