@@ -8,3 +8,4 @@ rand = "0.4.2"
 
 [dev-dependencies]
 tic-tac-toe = {path = "../tic-tac-toe"}
+player-of-games = {path = "../player-of-games"}

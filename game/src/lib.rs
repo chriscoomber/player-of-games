@@ -1,14 +1,21 @@
 extern crate rand;
 
+use std::hash::Hash;
+
 pub trait Player<Game: GameState> {
-    fn choose_move(&self, game: &Game) -> <Game as GameState>::Move;
+    fn choose_move(&mut self, game: Game) -> <Game as GameState>::Move;
+    /// Default implementation is do nothing
+    fn inform_of_move_played(&mut self, new_state: Game, game_move: &<Game as GameState>::Move);
 }
 
 pub struct RandomPlayer(pub PlayerEnum);
 
 impl<Game: GameState> Player<Game> for RandomPlayer {
-    fn choose_move(&self, game: &Game) -> <Game as GameState>::Move {
+    fn choose_move(&mut self, game: Game) -> <Game as GameState>::Move {
         random_sample(game.all_legal_moves(self.0)).expect("There were no legal moves")
+    }
+    fn inform_of_move_played(&mut self, new_state: Game, game_move: &<Game as GameState>::Move) {
+        // noop
     }
 }
 
@@ -44,8 +51,11 @@ pub enum PlayerEnum {
     Two
 }
 
+pub enum PlayerOne {}
+pub enum PlayerTwo {}
+
 impl PlayerEnum {
-    fn other(&self) -> PlayerEnum {
+    pub fn other(&self) -> PlayerEnum {
         match *self {
             PlayerEnum::One => PlayerEnum::Two,
             PlayerEnum::Two => PlayerEnum::One,
@@ -59,10 +69,10 @@ pub enum Conclusion {
     Draw
 }
 
-pub trait GameState: std::fmt::Debug + Clone + 'static {
-    type Move: Copy;
+pub trait GameState: std::fmt::Debug + Clone + PartialEq + Eq + Hash + 'static {
+    type Move: std::fmt::Debug + Copy + Hash + PartialEq + Eq;
     fn update(&mut self, game_move: Self::Move, player: PlayerEnum);
-    fn update_with_closure<F: Fn(&Self) -> Self::Move>(&mut self, f: F, player: PlayerEnum) {
+    fn update_with_closure<F: FnMut(&Self) -> Self::Move>(&mut self, mut f: F, player: PlayerEnum) {
         let game_move = f(self);
         self.update(game_move, player);
     }
@@ -90,16 +100,23 @@ impl<Game: GameState, PlayerOne: Player<Game>, PlayerTwo: Player<Game>> Adjudica
     }
 
     pub fn progress_one_turn(&mut self) {
-        match self.current_turn {
+        let chosen_move = match self.current_turn {
             PlayerEnum::One => {
-                let player_one = &self.player_one;
-                self.game_state.update_with_closure(|state| player_one.choose_move(state), PlayerEnum::One)
+                let player_one = &mut self.player_one;
+                let chosen_move = player_one.choose_move(self.game_state.clone());
+                self.game_state.update(chosen_move, PlayerEnum::One);
+                chosen_move
             },
             PlayerEnum::Two => {
-                let player_two = &self.player_two;
-                self.game_state.update_with_closure(|state| player_two.choose_move(state), PlayerEnum::Two)
+                let player_two = &mut self.player_two;
+                let chosen_move = player_two.choose_move(self.game_state.clone());
+                self.game_state.update(chosen_move, PlayerEnum::Two);
+                chosen_move
             },
-        }
+        };
+
+        self.player_one.inform_of_move_played(self.game_state.clone(), &chosen_move);
+        self.player_two.inform_of_move_played(self.game_state.clone(), &chosen_move);
 
         // Log out the new game state:
         println!("New game state: \n{:?}", self.game_state);

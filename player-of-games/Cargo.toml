@@ -4,5 +4,7 @@ version = "0.1.0"
 authors = ["chriscoomber <Christopher.Coomber@metaswitch.com>"]
 
 [dependencies]
+game = {path = "../game"}
+daggy = "0.5.0"
 
 [dev-dependencies]

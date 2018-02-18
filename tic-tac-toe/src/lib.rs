@@ -7,7 +7,7 @@ use std::ops::Deref;
 
 use ndarray::prelude::*;
 
-#[derive(PartialEq, Clone, Copy, Debug)]
+#[derive(PartialEq, Eq, Clone, Copy, Debug, Hash)]
 pub enum Piece {
     Nought,
     Cross,
@@ -22,7 +22,7 @@ impl From<game::PlayerEnum> for Piece {
     }
 }
 
-#[derive(PartialEq, Clone, Copy, Debug)]
+#[derive(PartialEq, Eq, Clone, Copy, Debug, Hash)]
 pub struct OptionalPiece(Option<Piece>);
 
 impl From<Option<Piece>> for OptionalPiece {
@@ -50,7 +50,7 @@ impl fmt::Display for OptionalPiece {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Eq, PartialEq, Hash)]
 pub struct TicTacToe {
     state: Array2<OptionalPiece>
 }
@@ -145,7 +145,7 @@ impl fmt::Debug for TicTacToe {
 }
 
 /// Coordinates are guaranteed to be 0,1,2
-#[derive(PartialEq, Clone, Copy)]
+#[derive(PartialEq, Eq, Clone, Copy, Debug, Hash)]
 pub struct Move {
     coordinates: (usize, usize),
     piece: Piece,
